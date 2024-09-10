@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebRTC Play Demo</title>
+  <link rel="stylesheet" href="css/rtc_main.css" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="icon" href="data:;base64,=">
+  <style>
+    .video-container {
+      position: relative;
+      display: inline-block;
+    }
+    .play-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: url('play-icon.png') no-repeat center center;
+      background-size: contain;
+      cursor: pointer;
+      z-index: 2;
+    }
+    video {
+      display: block;
+      width: 100%; /* Ensure video is responsive */
+    }
+  </style>
+</head>
+<body>
+    <div class="video-container">
+      <video id="video2" autoplay playsinline preload="auto" poster="sample-poster.jpg" height="200" disablepictureinpicture></video>
+      <div id="play2" class="play-button"></div>
+    </div>
+  <script src="script.js"></script>
+  <script>
+    function onEvent(type, data) {
+      switch (type) {
+        case 3:
+          console.log((window.performance.now() / 1000).toFixed(3) + ": customer event : " + data);
+          break;
+        case 2:
+          console.log((window.performance.now() / 1000).toFixed(3) + ": customer event sdp: " + data.toString());
+          break;
+        case 1:
+          console.log((window.performance.now() / 1000).toFixed(3) + ": customer event caton");
+          break;
+        case 0:
+          console.log((window.performance.now() / 1000).toFixed(3) + ": customer event resume");
+          break;
+      }
+    }
+
+    function setupPlayer(videoElement, signalUrl, playButtonId) {
+      var player = window.wsrtcplayer.createWSRTCPlayer({
+        element: videoElement,
+        customerID: "bjweimiao",
+        listener: onEvent
+      });
+      player.open(signalUrl);
+      
+      document.getElementById(playButtonId).style.display = 'none'; // Hide play button after click
+      return player;
+    }
+
+    var player2;
+
+    function initializePlayer(player, videoElement, signalUrl, playButtonId) {
+      if (player) {
+        console.log('Destroying existing player');
+        player.close();
+      }
+      return setupPlayer(videoElement, signalUrl, playButtonId);
+    }
+
+    document.getElementById('play2').onclick = function() {
+      player2 = initializePlayer(
+        player2,
+        document.getElementById('video2'),
+        "https://pull.tripledg.live/A2A/Stream1-Pri.sdp?wsSecret=73013a51924f82eee67d8dad0faff46d&wsTime=1725951846",
+        'play2'
+      );
+    };
+  </script>
+</body>
+</html>
